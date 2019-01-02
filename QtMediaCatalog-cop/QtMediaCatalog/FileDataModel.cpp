@@ -1,6 +1,7 @@
 #include "FileDataModel.h"
 #include <qDebug>
 #include <QCheckBox>
+#pragma once
 
 FileDataModel::FileDataModel(QObject *parent)
 	: QAbstractTableModel(parent)
@@ -20,19 +21,18 @@ QVariant FileDataModel::data(const QModelIndex & index, int role) const
 		return QVariant();
 
 	if (role == Qt::DisplayRole) {
-		const QStringList curr = dataSource->GetNextFileData(index.row());// надо прописать в методе возврат индекса вектора 
-
-
+		const QStringList curr = dataSource->GetNextFileData(index.row());
 		//qDebug() << "ADDED" << curr.at(0);
 		switch (index.column()) {
 		case 0:
 			//QCheckBox* chbChoosen = new QCheckBox();
-			return "CheckBox is here";
-		case 1:
-			return "index";
+			return "CheckBox";
 		default:
 			// добавить проверку выхода индексов за границы QStringList
-			return curr.at(index.column() - 2);//можно вместо сдвига индексов вставлять колонку с checkIndex
+			if (index.column() - 1 <= curr.length()) {
+				return curr.at(index.column() - 1);//можно вместо сдвига индексов вставлять колонку с checkIndex
+			}
+			break;
 		}}
 	if ((role == Qt::CheckStateRole)&& (index.column() == 0)) {
 		if (filesChecked.contains(index.row()))//if (index.column() == 0) //add a checkbox to cell(1,0)
@@ -54,14 +54,14 @@ bool FileDataModel::setData(const QModelIndex & index, const QVariant & value, i
 			// add file if it was checked
 			filesChecked.append(index.row());
 			emit fileChoosen(true);
-			qDebug() << "LIST ITEM:  " << filesChecked.last();
+			qDebug() << "LIST LENGTH+:  " << filesChecked.length();
 		}
 		else{ 
 			//remove file if it was unchecked
-			int i = filesChecked.indexOf(index.row());//решить как посылать реальные индексы
+			int i = filesChecked.indexOf(index.row());
 			filesChecked.removeAt(i);
-			if (filesChecked.isEmpty()) emit noFilesChoosen();
-			qDebug()<<"LIST LENGTH:  "<<filesChecked.length();
+			if (filesChecked.isEmpty()) emit fileChoosen(false);// noFilesChoosen();
+			qDebug()<<"LIST LENGTH-:  "<<filesChecked.length();
 		}//emit editCompleted(result);// посылать сигнал вьюшке, чтобы она отображала галочку?
 	}/**/
 	return true;
@@ -73,6 +73,31 @@ Qt::ItemFlags FileDataModel::flags(const QModelIndex & index) const
 		return Qt::ItemIsUserCheckable | QAbstractTableModel::flags(index) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
 	else
 		return QAbstractTableModel::flags(index);
+}
+
+QVariant FileDataModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+	if (role == Qt::DisplayRole)
+	{
+		if (orientation == Qt::Horizontal) {
+			switch (section)
+			{
+			case 0:
+				return " ";
+			case 1:
+				return "File name";
+			case 2:
+				return "Type";
+			case 3:
+				return "Size";
+			case 4:
+				return "Catalog"; // ? IsOrganized
+			default:
+				break;
+			}
+		}
+	}
+	return QVariant();
 }
 
 bool FileDataModel::insertRows(int row, int count, const QModelIndex & parent)
@@ -101,6 +126,7 @@ void FileDataModel::SendFilesList(QString dirName)
 {
 	emit addFilesToDir(dirName, filesChecked);
 	filesChecked.clear();
+	qDebug() << "LIST IS CLEARED!!!";
 }
 
 void FileDataModel::updateCatalog()

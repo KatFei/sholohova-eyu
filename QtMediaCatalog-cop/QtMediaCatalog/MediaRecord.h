@@ -40,8 +40,10 @@ public:
 	//MediaRecord(const MediaRecord& rec);
 	~MediaRecord();
 	void CopyFile(QString newPath);
-	QStringList ToString();//returns array with file info? char*[]
+	QStringList ToString();//returns array with file info
 	bool IsOrganized();
+	void SetNewDir(QString dirName);
+	QString GetNewDir();
 };
 
 

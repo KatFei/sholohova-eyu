@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Catalog_t {
-    QByteArrayData data[16];
-    char stringdata0[157];
+    QByteArrayData data[15];
+    char stringdata0[149];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -37,22 +37,21 @@ QT_MOC_LITERAL(1, 8, 14), // "catalogIsReady"
 QT_MOC_LITERAL(2, 23, 0), // ""
 QT_MOC_LITERAL(3, 24, 11), // "dataChanged"
 QT_MOC_LITERAL(4, 36, 9), // "organized"
-QT_MOC_LITERAL(5, 46, 14), // "dirsFullUpdate"
-QT_MOC_LITERAL(6, 61, 4), // "dirs"
-QT_MOC_LITERAL(7, 66, 8), // "dirAdded"
-QT_MOC_LITERAL(8, 75, 7), // "dirName"
-QT_MOC_LITERAL(9, 83, 11), // "FillCatalog"
-QT_MOC_LITERAL(10, 95, 4), // "path"
-QT_MOC_LITERAL(11, 100, 13), // "OrganizeFiles"
-QT_MOC_LITERAL(12, 114, 10), // "QList<int>"
-QT_MOC_LITERAL(13, 125, 7), // "chfiles"
-QT_MOC_LITERAL(14, 133, 15), // "GenerateCatalog"
-QT_MOC_LITERAL(15, 149, 7) // "newPath"
+QT_MOC_LITERAL(5, 46, 8), // "dirAdded"
+QT_MOC_LITERAL(6, 55, 7), // "dirName"
+QT_MOC_LITERAL(7, 63, 11), // "FillCatalog"
+QT_MOC_LITERAL(8, 75, 4), // "path"
+QT_MOC_LITERAL(9, 80, 11), // "SearchFiles"
+QT_MOC_LITERAL(10, 92, 13), // "OrganizeFiles"
+QT_MOC_LITERAL(11, 106, 10), // "QList<int>"
+QT_MOC_LITERAL(12, 117, 7), // "chfiles"
+QT_MOC_LITERAL(13, 125, 15), // "GenerateCatalog"
+QT_MOC_LITERAL(14, 141, 7) // "newPath"
 
     },
     "Catalog\0catalogIsReady\0\0dataChanged\0"
-    "organized\0dirsFullUpdate\0dirs\0dirAdded\0"
-    "dirName\0FillCatalog\0path\0OrganizeFiles\0"
+    "organized\0dirAdded\0dirName\0FillCatalog\0"
+    "path\0SearchFiles\0OrganizeFiles\0"
     "QList<int>\0chfiles\0GenerateCatalog\0"
     "newPath"
 };
@@ -69,31 +68,31 @@ static const uint qt_meta_data_Catalog[] = {
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       5,       // signalCount
+       4,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
        1,    0,   54,    2, 0x06 /* Public */,
        3,    0,   55,    2, 0x06 /* Public */,
        4,    0,   56,    2, 0x06 /* Public */,
        5,    1,   57,    2, 0x06 /* Public */,
-       7,    1,   60,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
+       7,    1,   60,    2, 0x0a /* Public */,
        9,    1,   63,    2, 0x0a /* Public */,
-      11,    2,   66,    2, 0x0a /* Public */,
-      14,    1,   71,    2, 0x0a /* Public */,
+      10,    2,   66,    2, 0x0a /* Public */,
+      13,    1,   71,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QStringList,    6,
-    QMetaType::Void, QMetaType::QString,    8,
+    QMetaType::Void, QMetaType::QString,    6,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::QString,   10,
-    QMetaType::Void, QMetaType::QString, 0x80000000 | 12,    8,   13,
-    QMetaType::Void, QMetaType::QString,   15,
+    QMetaType::Void, QMetaType::QString,    8,
+    QMetaType::Void, QMetaType::QString,    8,
+    QMetaType::Void, QMetaType::QString, 0x80000000 | 11,    6,   12,
+    QMetaType::Void, QMetaType::QString,   14,
 
        0        // eod
 };
@@ -107,9 +106,9 @@ void Catalog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         case 0: _t->catalogIsReady(); break;
         case 1: _t->dataChanged(); break;
         case 2: _t->organized(); break;
-        case 3: _t->dirsFullUpdate((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
-        case 4: _t->dirAdded((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 5: _t->FillCatalog((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 3: _t->dirAdded((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 4: _t->FillCatalog((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 5: _t->SearchFiles((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 6: _t->OrganizeFiles((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QList<int>(*)>(_a[2]))); break;
         case 7: _t->GenerateCatalog((*reinterpret_cast< QString(*)>(_a[1]))); break;
         default: ;
@@ -149,16 +148,9 @@ void Catalog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
             }
         }
         {
-            using _t = void (Catalog::*)(QStringList );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Catalog::dirsFullUpdate)) {
-                *result = 3;
-                return;
-            }
-        }
-        {
             using _t = void (Catalog::*)(QString );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Catalog::dirAdded)) {
-                *result = 4;
+                *result = 3;
                 return;
             }
         }
@@ -220,17 +212,10 @@ void Catalog::organized()
 }
 
 // SIGNAL 3
-void Catalog::dirsFullUpdate(QStringList _t1)
-{
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 3, _a);
-}
-
-// SIGNAL 4
 void Catalog::dirAdded(QString _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 4, _a);
+    QMetaObject::activate(this, &staticMetaObject, 3, _a);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE

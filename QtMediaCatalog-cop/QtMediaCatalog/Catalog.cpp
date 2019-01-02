@@ -7,39 +7,40 @@ Catalog::Catalog(QObject *parent)
 	: QObject(parent)
 {
 	n = 0;
-	it = 0;
 }
 
 Catalog::~Catalog()
 {
 }
 
-void Catalog::FillCatalog(QString path)
+void Catalog::SearchFiles(QString path)
 {
-	
-	QDir dir(path);qDebug() << "FILLING CATALOG"<< dir.absolutePath();
+	QDir dir(path); qDebug() << "FILLING CATALOG" << dir.absolutePath();
 	for (QFileInfo i : dir.entryInfoList()) {
-		
-		if (i.absolutePath() == dir.absolutePath()) 
+
+		if (i.absolutePath() == dir.absolutePath())
 		{
-			if (i.isDir()) 
+			if (i.isDir())
 			{
-				FillCatalog(i.absolutePath()+"/"+i.baseName());
+				FillCatalog(i.absolutePath() + "/" + i.baseName());
 			}
 			else
 			{
-				//MediaRecord temp(i);
-				fileTodir tempstruct{ MediaRecord(i), "" };
-				//files.resize(files.size() + 10);
-				files.push_back(tempstruct);
+				//files.resize(files.size() + 10); ???
+				files.push_back(MediaRecord(i));
 				qDebug() << "ADDING " << i.fileName();
-				MediaRecord temp(files.at(n).rec);
-			
-				qDebug() << "ADDED"<<temp.ToString().at(0);
+				MediaRecord temp(files.at(n));
+				qDebug() << "ADDED" << temp.ToString().at(0);
 				n += 1;
 			}
 		};
 	};
+}
+
+void Catalog::FillCatalog(QString path)
+{
+	SearchFiles(path);
+	
 	qDebug() << n << " FILES ADDED";
 	emit catalogIsReady();//dataChanged();!!!!!!!!!!чтобы вызывать один раз, надо добавить в Ќ≈ –≈ ”–—»¬Ќџ… метод
 }
@@ -49,15 +50,9 @@ QStringList Catalog::GetNextFileData(int i)
 	if ((i<GetSize())&&(i>=0))
 	{
 
-		MediaRecord temp(files.at(i).rec);
-		return temp.ToString();
-	}/*if (it<GetSize())
-	{
-		
-		MediaRecord temp(files.at(it).rec);
-		it++;
-		return temp.ToString();
-	}*/
+		MediaRecord temp(files.at(i));
+		return temp.ToString()<<temp.GetNewDir();
+	}
 	return QStringList();//  ??? empty?
 }
 
@@ -67,9 +62,11 @@ void Catalog::OrganizeFiles(QString dirName, QList<int> chfiles)
 	dirs.append(dirName);
 	for each (int i in chfiles)
 	{
-		//files.at(i).dir = dirName;
+		//MediaRecord *temp = &files.;
+		files.operator[](i).SetNewDir(dirName);
 	}
-	emit dirsFullUpdate(dirs);
+	emit dirAdded(dirName);			//dirsFullUpdate(dirs);
+	emit organized();
 }
 
 void Catalog::GenerateCatalog(QString newPath)

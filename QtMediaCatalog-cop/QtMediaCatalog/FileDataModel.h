@@ -17,7 +17,7 @@ public:
 	QVariant data(const QModelIndex &index, int role) const override;
 	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 	Qt::ItemFlags flags(const QModelIndex & index) const override;
-	//QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+	QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 	bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;//const override?
 	void setDataSource(Catalog *source);
 	void addData();
@@ -27,7 +27,7 @@ public slots :
 signals:
 	void isFileChecked(bool check);
 	void fileChoosen(bool choosen);
-	void noFilesChoosen();
+	//void noFilesChoosen();
 	void addFilesToDir(QString dirName, QList<int> chfiles);
 private:
 	Catalog *dataSource;

@@ -4,13 +4,14 @@
 #include "ui_QtMediaCatalog.h"
 #include "FileDataModel.h"
 #include "CheckBoxDelegate.h"
-#include <QSortFilterProxyModel>
+#include "ProxyModel.h"
 #include <QStandardItemModel>
 
 #include "qlayout.h"
-#include "qlabel.h"
-#include "qlineedit.h"
-#include "qpushbutton.h"
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QComboBox>
 #include "qtreewidget.h"
 #include "qtableview.h"
 #include "qlist.h"
@@ -31,11 +32,13 @@ private:
 	QPushButton *butFilter;
 	QLineEdit *editPath;
 	QLineEdit *editExt;
+	QLineEdit *editFilter;
+	QComboBox *combType;
 	QTableView *fileTable;
 	QTreeWidget *treeDirs;
 	FileDataModel *model;
 	CheckBoxDelegate *chbDelegate;
-	QSortFilterProxyModel *filterModel;
+	ProxyModel *filterModel;
 	Catalog* catalog;
 signals:
 	//void BrowseClicked();
