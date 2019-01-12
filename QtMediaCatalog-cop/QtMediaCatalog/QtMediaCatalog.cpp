@@ -1,5 +1,6 @@
 #include "QtMediaCatalog.h"
 #include "EnterPathDialog.h"
+#include "EnterDirNameDialog.h"
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QRegExp>
@@ -21,6 +22,7 @@ QtMediaCatalog::QtMediaCatalog(QWidget *parent)
 	butAddToDir = new QPushButton("Add To Directory", mainWdgt);
 	butAddToDir->setEnabled(false);
 	butGenerateCat = new QPushButton("Generate Media Catalog", mainWdgt);
+	butGenerateCat->setEnabled(false);
 	butFilter = new QPushButton("Filter", mainWdgt);
 	editFilter = new QLineEdit(mainWdgt);
 	editFilter->setPlaceholderText("Enter pattern for search");
@@ -31,6 +33,7 @@ QtMediaCatalog::QtMediaCatalog(QWidget *parent)
 	editPath->setReadOnly(true);
 	editExt = new QLineEdit(mainWdgt);
 	editExt->setPlaceholderText("Extensions");
+	editExt->setValidator(new QRegExpValidator(QRegExp("([A-Z][a-z]{2,4} )+", Qt::CaseInsensitive)));
 	treeDirs = new QTreeWidget(mainWdgt);
 	treeDirs->setHeaderHidden(true);
 	fileTable = new QTableView(mainWdgt);//QTableWidget(1,5,mainWdgt)
@@ -42,19 +45,12 @@ QtMediaCatalog::QtMediaCatalog(QWidget *parent)
 	fileTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	fileTable->horizontalHeader()->setMinimumWidth(25);
 
-	/*model = new FileDataModel();
-	model->setDataSource(catalog);
-	
-	//fileTable->setModel(model);*/
 	fileTable->setFixedHeight(400);
 	fileTable->verticalHeader()->hide();
 	fileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-	//QHeaderView *verticalHeader = fileTable->verticalHeader();
 
 		//Layout and widgets positioning 
 	QGridLayout *mainLayout = new QGridLayout;
-	//fileTable->setRowHeight();
-	//QList<QWidget> *widgets = new QList<QWidget>;
 	////widgets->append(butAddToDir);
 	mainLayout->addWidget(editPath, 0, 0, 1, 4, Qt::AlignVCenter);
 	mainLayout->addWidget(butBrowse,0,4);//, Qt::AlignLeft
@@ -80,22 +76,24 @@ QtMediaCatalog::QtMediaCatalog(QWidget *parent)
 	//setBaseSize();
 	setFixedSize(900, 600);
 
-	//Connecting signals and slots
+		//Connecting signals and slots
 	connect(this, SIGNAL(pathEntered(QString)), catalog, SLOT(FillCatalog(QString)));
+	connect(catalog, SIGNAL(catalogIsReady()), treeDirs, SLOT(clear()));
 	connect(catalog, SIGNAL(catalogIsReady()), this, SLOT(UpdateTable()));
+	//connect(catalog, SIGNAL(catalogIsReady()), butGenerateCat, SLOT([&] {setEnabled(true); }));
 	connect(butBrowse, SIGNAL(clicked()), this, SLOT(OpenFileBrowser()));
 	connect(butSearch, SIGNAL(clicked()), this, SLOT(SearchClicked()));
-	connect(butAddToDir, SIGNAL(clicked()), this, SLOT(AddClicked()));/*
-	connect(butGenerateCat, SIGNAL(clicked()), this, SLOT(GenerateCatalog()));
+	connect(butAddToDir, SIGNAL(clicked()), this, SLOT(AddClicked()));
+	connect(butGenerateCat, SIGNAL(clicked()), this, SLOT(GenerateClicked()));/*
 	connect(catalog, SIGNAL(dirsFullUpdate(QStringList)), this, SLOT(UpdateTree(QStringList)));*/
-	
 	connect(catalog, SIGNAL(dirAdded(QString)), this, SLOT(AddDirToTree(QString)));
+	connect(this, SIGNAL(organizingCompleted(QString)), catalog, SLOT(GenerateCatalog(QString)));
+	connect(catalog, SIGNAL(generated(int)), this, SLOT(Generated(int)));
 }
 
 void QtMediaCatalog::SearchClicked() {
 	qDebug() << "PATH ENTERED"<< editPath->text();
-	emit pathEntered(editPath->text());
-	
+	emit pathEntered(editPath->text());	
 }
 void QtMediaCatalog::UpdateTable()
 {
@@ -109,8 +107,9 @@ void QtMediaCatalog::UpdateTable()
 
 	//connect(model, SIGNAL(noFilesChoosen()), butAddToDir, SLOT(setEnabled(false)));//[&] {AddToDir->setEnabled(false); }
 	connect(model, SIGNAL(fileChoosen(bool)), butAddToDir, SLOT(setEnabled(bool)));//[&] {AddToDir->setEnabled(true); qDebug() << "LAMBDA"; }
+	//separate slot? lambda?
 
-	connect(this, SIGNAL(DirEntered(QString)), model, SLOT(SendFilesList(QString)));
+	connect(this, SIGNAL(dirEntered(QString)), model, SLOT(SendFilesList(QString)));
 	connect(model, SIGNAL(addFilesToDir(QString, QList<int>)), catalog, SLOT(OrganizeFiles(QString, QList<int>)));
 	//calling invalidate() to refresh filter settings
 	//we need this when adding files to directory
@@ -137,71 +136,67 @@ void QtMediaCatalog::AddDirToTree(QString dirName)
 	
 	qDebug() << "ADDING DIR TO TREE";
 	
-	// добавить парсинг входящего имени для определения уровня директории в дереве
-
 	dirName.replace("\\", "/");
 	QStringList dirsTmp = dirName.split("/");
+
 	// if it's a top level item - add to tree
-	if (dirsTmp.size() == 1) //	QList<QTreeWidgetItem*> rootItems = treeDirs->findItems(dirsTmp[0], Qt::MatchFixedString | Qt::MatchCaseSensitive); if (rootItems.isEmpty() || (dirsTmp.size() == 1))
+	QTreeWidgetItem* parentItem = Q_NULLPTR;
+	if (treeDirs->findItems(dirsTmp[0], Qt::MatchFixedString | Qt::MatchCaseSensitive).isEmpty())
 	{
 		QTreeWidgetItem* temp;
 		temp = new QTreeWidgetItem();
 		temp->setText(0, dirsTmp[0]);
 		treeDirs->addTopLevelItem(temp);
 		treeDirs->expandItem(temp);
-		qDebug() << "DIR ADDED";
+		qDebug() << "ROOT DIR ADDED" << dirsTmp[0];
+		//parentItem = temp;
 	}
 	//if not, we should find it's root node
-	else 
+	//rootItems[j]->text(0) - 1st column
+	QList<QTreeWidgetItem*> rootItems = treeDirs->findItems(dirsTmp[0], Qt::MatchFixedString | Qt::MatchCaseSensitive); 
+	for(int j = 0; j<rootItems.size(); j++){
+		
+		if(rootItems[j]->text(0)== dirsTmp[0])	{ 
+			parentItem = rootItems[j];
+			break;
+		}		
+	}
+	for(int i=1; i<dirsTmp.size();i++)
 	{
-		QList<QTreeWidgetItem*> rootItems = treeDirs->findItems(dirsTmp[0], Qt::MatchFixedString | Qt::MatchCaseSensitive);
-		QTreeWidgetItem* parentItem;
-		for(int j = 0; j<rootItems.size(); j++){
-			if(rootItems[j]->text(0)== dirsTmp[0])		
-				parentItem = rootItems[j];
+		bool parentFound = false;
+		for (int j = 0; j<parentItem->childCount(); j++) {
+			
+			if (parentItem->child(j)->text(0) == dirsTmp[i])
+			{	
+				parentItem = parentItem->child(j); 
+				parentFound = true;
+				break;
+			}						
 		}
-		for(int i=1; i<dirsTmp.size()-1;i++)
-		{
-			if (parentItem->text(0) == dirsTmp[i])	;
-			for (int j = 0; j<parentItem->childCount(); j++) {
-				if (parentItem->child(j)->text(0) == dirsTmp[i])
-					parentItem = parentItem->child(j);
-			}
-		}
-		if (parentItem->text(0)!=dirsTmp.last())
-		{
+		if(!parentFound){		
 			QTreeWidgetItem* temp;
 			temp = new QTreeWidgetItem();
-			temp->setText(0, dirsTmp.last());
+			temp->setText(0, dirsTmp[i]);
 			parentItem->addChild(temp);
 			treeDirs->expandItem(temp);
+			parentItem = temp;
 			qDebug() << "DIR ADDED";
 		}
-
 	}
-	
-	/*QTreeWidgetItem* temp;
-	dirName.replace("\\", "/");
-	if (dirName.count("/")!=0)
-	{
-		QStringList dirsTmp = dirName.split("/");
-
-		if (treeDirs->findItems(dirsTmp[0], Qt::MatchFixedString).isEmpty())
-		{
-			temp->setText(0, dirsTmp[0]);
-			treeDirs->addTopLevelItem(temp);
-		}
-		for each(QString str in dirsTmp) 
-		{
-		
-		}
-	}
-	else
-	{ 
-		temp->setText(0, dirName);
-		treeDirs->addTopLevelItem(temp); 
-	}*/
-		
+	//where to place this: (maybe separate slot so it depends on number of dirs)
+	//not working if new search is done
+	if(treeDirs->topLevelItemCount()!=0)
+		butGenerateCat->setEnabled(true);
+	else 
+		butGenerateCat->setEnabled(false);
+			
+}
+void QtMediaCatalog::Generated(int fails)
+{
+	QMessageBox *msgBox = new QMessageBox(QMessageBox::NoIcon, "Finished",
+		QString("Mediacatalog is generated. \n Fail to copy %1 files.").arg(QString::number(fails)),
+		QMessageBox::Ok, this);
+	msgBox->exec();
 }
 void QtMediaCatalog::OpenFileBrowser() {
 	qDebug() << "OPEN FILE DIALOG";
@@ -220,17 +215,38 @@ void QtMediaCatalog::OpenFileBrowser() {
 
 void QtMediaCatalog::AddClicked()
 {
-	bool ok;
-	// добавить проверку вводимого значения с помощью регэксп (условия по именованию папок! В ОТЧЕТ в теор часть)
+	//bool ok;
+	//// добавить проверку вводимого значения с помощью регэксп (условия по именованию папок! В ОТЧЕТ в теор часть)
+	//QString dirName = QInputDialog::getText(this, "Input Dialog", "Enter directory name", QLineEdit::Normal, QString(), &ok);
+	//if (ok && !dirName.isEmpty())
+	//	emit dirEntered(dirName);
+	//;
 
-	QString dirName = QInputDialog::getText(this, "Input Dialog", "Enter directory name", QLineEdit::Normal, QString(), &ok);
 
-	if (ok && !dirName.isEmpty())
-		emit DirEntered(dirName);
-	;
 
-	//connect(butAdd, SIGNAL(clicked()), editDir,SLOT)
+	EnterDirNameDialog* inputDlg = new EnterDirNameDialog(this);
+	if(inputDlg->exec()==QDialog::Accepted)
+	{
+		QString dirName = inputDlg->GetDirName();
+		//перенести проверку на пустую строку в класс диалога
+		if (!dirName.isEmpty()) emit dirEntered(dirName);
+	}
+
+	//connect(butAdd, SIGNAL(clicked()), editName,SLOT)
 	//проверять ввели или не ввели (отмена или ок)
 	// как вообще возвращать значение из диалога? по кнопке ok сигналом в слот?
 	
+}
+
+void QtMediaCatalog::GenerateClicked()
+{
+	//заменить на кастомный диалог с проверкой вводимой директории
+	// и вводом имени каталога
+	QString catalogPath = QFileDialog::getExistingDirectory(this, tr("Choose directory or create new"), "C:/",
+		QFileDialog::ShowDirsOnly
+		| QFileDialog::DontResolveSymlinks);
+	if (!catalogPath.isEmpty()) {
+		emit organizingCompleted(catalogPath);
+		qDebug() << "SIGNAL EMITTED";
+	}
 }

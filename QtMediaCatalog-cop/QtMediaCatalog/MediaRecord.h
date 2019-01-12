@@ -39,11 +39,12 @@ public:
 	MediaRecord(QFileInfo fInfo);
 	//MediaRecord(const MediaRecord& rec);
 	~MediaRecord();
-	void CopyFile(QString newPath);
+	bool CopyFile(QString newPath);
 	QStringList ToString();//returns array with file info
 	bool IsOrganized();
 	void SetNewDir(QString dirName);
 	QString GetNewDir();
+	int FileSize() { return fileInfo.size(); };
 };
 
 

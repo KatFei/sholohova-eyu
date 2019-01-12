@@ -17,12 +17,12 @@ bool ProxyModel::filterAcceptsRow(int srcRow, const QModelIndex & srcParent) con
 	QModelIndex indexName = sourceModel()->index(srcRow, 2, srcParent);
 	if(!sourceModel()->data(index).toString().isEmpty())
 	{ 
-		qDebug() << sourceModel()->data(indexName).toString();
-		qDebug() << "FILTERING IN IF";
+		//qDebug() << sourceModel()->data(indexName).toString();
+		//qDebug() << "FILTERING IN IF";
 		
 		return false; }
-	qDebug() << "FILTERING";
-	qDebug() << sourceModel()->data(indexName).toString();
+	//qDebug() << "FILTERING";
+	//qDebug() << sourceModel()->data(indexName).toString();
 	return true;
 
 }

@@ -42,18 +42,20 @@ private:
 	Catalog* catalog;
 signals:
 	//void BrowseClicked();
-	void pathEntered(QString pathToDir);
-	void DirEntered(QString dirName);
-	//void GenerateClicked();
+	void pathEntered(QString pathToDir, QString extensions = "");
+	void dirEntered(QString dirName);
+	void organizingCompleted(QString pathToCat);
 
 public slots:
 	void UpdateTable();//Catalog* catalog
 	void UpdateTree(QStringList dirs);//Qlist из Catalog
 	void AddDirToTree(QString dirName);
+	void Generated(int fails);
 private slots :
 	void SearchClicked();
 	void OpenFileBrowser();//?возвращать QString?
 	void AddClicked();
+	void GenerateClicked();
 	/*void AddFileToCat();
 	void GenerateCatalog();*/
 };

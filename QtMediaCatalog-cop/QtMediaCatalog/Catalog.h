@@ -29,4 +29,5 @@ signals:
 	void organized();
 	//void dirsFullUpdate(QStringList dirs);
 	void dirAdded(QString dirName);
+	void generated(int fails);
 };

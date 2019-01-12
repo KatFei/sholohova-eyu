@@ -54,6 +54,9 @@
     <ClCompile Include="ProxyModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EnterDirNameDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="QtMediaCatalog.h">
@@ -74,6 +77,9 @@
     <QtMoc Include="ProxyModel.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="EnterDirNameDialog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="QtMediaCatalog.ui">
@@ -89,5 +95,8 @@
     <ClInclude Include="MediaRecord.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

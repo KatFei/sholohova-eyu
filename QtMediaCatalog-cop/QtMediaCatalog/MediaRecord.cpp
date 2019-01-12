@@ -20,20 +20,30 @@ MediaRecord::MediaRecord(QFileInfo fInfo)
 }*/
 MediaRecord::~MediaRecord() {}
 
-void MediaRecord::CopyFile(QString newPath)
+bool MediaRecord::CopyFile(QString newPath)
 {
-	QFile fileTmp(fileInfo.absoluteFilePath());
-	if (!fileTmp.copy(fileInfo.absoluteFilePath(), newPath + "/" + newDir)) {
+	if (!QFile::copy(fileInfo.absoluteFilePath(), newPath + "/" + newDir+"/" + fileInfo.fileName())) {
 		qDebug() << "Copying file "<<fileInfo.absoluteFilePath()<<" failed!"
 			;
+		qDebug() << newPath + "/" + newDir + "/" + fileInfo.fileName();
+		return false;
+	}
+	else
+	{
+		qDebug() << fileInfo.absoluteFilePath() << " is copied to:";
+		qDebug() << newPath + "/" + newDir + "/" + fileInfo.fileName();
+		return true;
 	}
 }
 
 QStringList MediaRecord::ToString()
 {
-	return (QStringList()<<fileInfo.fileName()
-		<< fileInfo.completeSuffix())
-		<< QString::number((float)fileInfo.size()/1024/1024,'g',2)+" Mb";
+	return (QStringList() << fileInfo.fileName()
+		<< fileInfo.suffix())
+		<<
+		(((float)fileInfo.size() / 1024 / 1024) > 1023 ? 
+			QString::number((float)fileInfo.size() / 1024 / 1024 / 1024, 'f', 2) + " Gb"
+			: QString::number((float)fileInfo.size() / 1024 / 1024, 'f', 2) + " Mb");
 }
 
 bool MediaRecord::IsOrganized()
@@ -54,7 +64,6 @@ QString MediaRecord::GetNewDir()
 {
 	return newDir;
 }
-
 
 //MediaRecord::MediaRecord(QObject *parent)
 //	: QObject(parent)
