@@ -46,24 +46,21 @@ QVariant FileDataModel::data(const QModelIndex & index, int role) const
 
 bool FileDataModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
-	QModelIndex ind = this->index(index.row(), 5);
-	int recIndex = data(ind, Qt::DisplayRole).toInt();//int recIndex = data(this->index(index.row(),5), Qt::DisplayRole).toInt();
-	
 	if (role == Qt::EditRole)
 	{
 		//check value from editor
 		if (value.toBool()) {
 			// add file if it was checked
-			filesChecked.append(recIndex);	//recIndex
+			filesChecked.append(index.row());	//recIndex
 			emit fileChoosen(true);
 			qDebug() << "LIST LENGTH+:  " << filesChecked.length();
 		}
-		else{ 
+		else {
 			//remove file if it was unchecked
-			int i = filesChecked.indexOf(recIndex);
+			int i = filesChecked.indexOf(index.row());	//recIndex
 			filesChecked.removeAt(i);
 			if (filesChecked.isEmpty()) emit fileChoosen(false);// noFilesChoosen();
-			qDebug()<<"LIST LENGTH-:  "<<filesChecked.length();
+			qDebug() << "LIST LENGTH-:  " << filesChecked.length();
 		}//emit editCompleted(result);// посылать сигнал вьюшке, чтобы она отображала галочку?
 	}/**/
 	return true;
