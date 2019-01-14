@@ -11,6 +11,7 @@ private:
 	QString path;
 	QVector <MediaRecord> files;	
 	QStringList dirs;
+	QString extensions;
 	int n;
 public:
 	Catalog(QObject *parent = Q_NULLPTR);
@@ -19,8 +20,8 @@ public:
 	QStringList GetNextFileData(int i);
 	MediaRecord GetRecord(int i) { return files.at(i); };
 public slots:
-	void FillCatalog(QString path);
-	void SearchFiles(QString path);
+	void FillCatalog(QString path, QString strExts = "");
+	void SearchFiles(QString path, QString strExts);
 	void OrganizeFiles(QString dirName, QList<int> chfiles);
 	void GenerateCatalog(QString newPath);
 signals:

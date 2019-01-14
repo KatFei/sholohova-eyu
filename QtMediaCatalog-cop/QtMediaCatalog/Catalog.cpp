@@ -9,16 +9,16 @@ Catalog::Catalog(QObject *parent)
 	: QObject(parent)
 {
 	n = 0;
+	extensions = "*.mp3 *.avi *.mkv *.mp4 ";
 }
 
 Catalog::~Catalog()
 {
 }
 
-void Catalog::SearchFiles(QString path)
+void Catalog::SearchFiles(QString path, QString strExts)
 {
-	QDir dir(path); qDebug() << "FILLING CATALOG" << dir.absolutePath();
-	QString strExts("*.mp3 *.avi *.mkv *.mp4");
+	QDir dir(path);					qDebug() << "FILLING CATALOG" << dir.absolutePath();
 	QStringList exts(strExts.split(" "));
 	for (QFileInfo i : dir.entryInfoList(exts,QDir::Files|QDir::AllDirs)) {
 
@@ -41,13 +41,15 @@ void Catalog::SearchFiles(QString path)
 	};
 }
 
-void Catalog::FillCatalog(QString path)
+void Catalog::FillCatalog(QString path, QString strExts)
 {
 	//maybe its better to create catalog for each search??
 	/*if(!files.isEmpty()) files.clear();
 	if (!dirs.isEmpty()) dirs.clear();
 	n = 0;*/
-	SearchFiles(path);
+	if(extensions != strExts)
+		extensions += strExts;
+	SearchFiles(path, extensions);
 	
 	qDebug() << n << " FILES ADDED";
 	emit catalogIsReady();
@@ -59,7 +61,7 @@ QStringList Catalog::GetNextFileData(int i)
 	{
 
 		MediaRecord temp(files.at(i));
-		return temp.ToString()<<temp.GetNewDir();
+		return temp.ToString()<<temp.GetNewDir()<<QString::number(i);
 	}
 	return QStringList();
 }

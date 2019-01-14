@@ -34,19 +34,19 @@ QtMediaCatalog::QtMediaCatalog(QWidget *parent)
 	editExt = new QLineEdit(mainWdgt);
 	editExt->setPlaceholderText("Extensions");
 	editExt->setValidator(new QRegExpValidator(QRegExp("([A-Z][a-z]{2,4} )+", Qt::CaseInsensitive)));
+	editExt->setText("*.mp3 *.avi *.mkv *.mp4 ");
 	treeDirs = new QTreeWidget(mainWdgt);
 	treeDirs->setHeaderHidden(true);
 	fileTable = new QTableView(mainWdgt);//QTableWidget(1,5,mainWdgt)
 	model = Q_NULLPTR;
-	chbDelegate = new CheckBoxDelegate(this);//parent- fileTable?
-	fileTable->setItemDelegateForColumn(0,chbDelegate);
+	//chbDelegate = new CheckBoxDelegate(this);//parent- fileTable?
+	//fileTable->setItemDelegateForColumn(0,chbDelegate);
 	filterModel = new ProxyModel(this);
 	fileTable->setSortingEnabled(true);
-	fileTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-	fileTable->horizontalHeader()->setMinimumWidth(25);
-
+	
 	fileTable->setFixedHeight(400);
 	fileTable->verticalHeader()->hide();
+	fileTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	fileTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 		//Layout and widgets positioning 
@@ -77,7 +77,7 @@ QtMediaCatalog::QtMediaCatalog(QWidget *parent)
 	setFixedSize(900, 600);
 
 		//Connecting signals and slots
-	connect(this, SIGNAL(pathEntered(QString)), catalog, SLOT(FillCatalog(QString)));
+	connect(this, SIGNAL(pathEntered(QString, QString)), catalog, SLOT(FillCatalog(QString, QString)));
 	connect(catalog, SIGNAL(catalogIsReady()), treeDirs, SLOT(clear()));
 	connect(catalog, SIGNAL(catalogIsReady()), this, SLOT(UpdateTable()));
 	//connect(catalog, SIGNAL(catalogIsReady()), butGenerateCat, SLOT([&] {setEnabled(true); }));
@@ -93,7 +93,8 @@ QtMediaCatalog::QtMediaCatalog(QWidget *parent)
 
 void QtMediaCatalog::SearchClicked() {
 	qDebug() << "PATH ENTERED"<< editPath->text();
-	emit pathEntered(editPath->text());	
+	emit pathEntered("E:/Video", editExt->text()); //(editPath->text());
+	//emit pathEntered(editPath->text(), editExt->text());
 }
 void QtMediaCatalog::UpdateTable()
 {
@@ -104,6 +105,21 @@ void QtMediaCatalog::UpdateTable()
 		filterModel->setSourceModel(model);
 		fileTable->setModel(filterModel);
 		fileTable->hideColumn(4);
+		fileTable->hideColumn(5);
+		//fileTable->horizontalHeader()->setMaximumSectionSize(400);
+		//fileTable->resizeColumnToContents(0);
+		fileTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
+		fileTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Fixed);
+		fileTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Fixed);
+		fileTable->horizontalHeader()->resizeSection(0,10);
+		fileTable->horizontalHeader()->resizeSection(2, 50);
+		fileTable->horizontalHeader()->resizeSection(3, 100);
+		fileTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Interactive);
+		/*fileTable->setColumnWidth(0, 10);
+		fileTable->setColumnWidth(2, 50);
+		fileTable->setColumnWidth(3, 100);*/
+		fileTable->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+		
 
 	//connect(model, SIGNAL(noFilesChoosen()), butAddToDir, SLOT(setEnabled(false)));//[&] {AddToDir->setEnabled(false); }
 	connect(model, SIGNAL(fileChoosen(bool)), butAddToDir, SLOT(setEnabled(bool)));//[&] {AddToDir->setEnabled(true); qDebug() << "LAMBDA"; }
@@ -115,7 +131,10 @@ void QtMediaCatalog::UpdateTable()
 	//we need this when adding files to directory
 	//so they should be removed from the view
 	connect(catalog, SIGNAL(organized()), filterModel, SLOT(invalidate()));
-	
+	connect(editFilter, SIGNAL(textChanged(QString)), filterModel, SLOT(SetSearchString(QString)));
+	connect(combType, SIGNAL(currentTextChanged(QString)), filterModel, SLOT(SetFileType(QString)));
+	connect(fileTable, SIGNAL(clicked(const QModelIndex &)), filterModel, SLOT(OnCellClicked(const QModelIndex &)));
+	connect(filterModel, SIGNAL(srcCellClicked(const QModelIndex &)), model, SLOT(OnCellClicked(const QModelIndex &)));
 }
 void QtMediaCatalog::UpdateTree(QStringList dirs)
 {

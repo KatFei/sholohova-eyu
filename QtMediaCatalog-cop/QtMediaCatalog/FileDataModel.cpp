@@ -17,48 +17,50 @@ QVariant FileDataModel::data(const QModelIndex & index, int role) const
 {
 	if (!index.isValid())
 		return QVariant();
-	if (index.row() >= dataSource->GetSize() || index.row() < 0)
+	else if (index.row() >= dataSource->GetSize() || index.row() < 0)
 		return QVariant();
-
-	if (role == Qt::DisplayRole) {
+	else
+	{
 		const QStringList curr = dataSource->GetNextFileData(index.row());
-		//qDebug() << "ADDED" << curr.at(0);
-		switch (index.column()) {
-		case 0:
-			//QCheckBox* chbChoosen = new QCheckBox();
-			return "CheckBox";
-		default:
-			// добавить проверку выхода индексов за границы QStringList
-			if (index.column() - 1 <= curr.length()) {
+
+		if ((role == Qt::CheckStateRole) && (index.column() == 0)) {
+			if (filesChecked.contains(curr.at(4).toInt()))	//if (index.column() == 0) //add a checkbox to cell(1,0)
+			{
+				return Qt::Checked;
+			}
+			else
+				return Qt::Unchecked;
+		}
+		if (role == Qt::DisplayRole) {
+			
+			//qDebug() << "ADDED" << curr.at(0);
+				// добавить проверку выхода индексов за границы QStringList
+			if ((index.column() - 1 <= curr.length()) && (index.column() != 0)) {
 				return curr.at(index.column() - 1);//можно вместо сдвига индексов вставлять колонку с checkIndex
 			}
-			break;
-		}}
-	if ((role == Qt::CheckStateRole)&& (index.column() == 0)) {
-		if (filesChecked.contains(index.row()))//if (index.column() == 0) //add a checkbox to cell(1,0)
-		{
-			return Qt::Checked;
 		}
-		else
-			return Qt::Unchecked;
-	}/**/
+	}
+/**/
 	return QVariant();
 }
 
 bool FileDataModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
+	QModelIndex ind = this->index(index.row(), 5);
+	int recIndex = data(ind, Qt::DisplayRole).toInt();//int recIndex = data(this->index(index.row(),5), Qt::DisplayRole).toInt();
+	
 	if (role == Qt::EditRole)
 	{
 		//check value from editor
 		if (value.toBool()) {
 			// add file if it was checked
-			filesChecked.append(index.row());
+			filesChecked.append(recIndex);	//recIndex
 			emit fileChoosen(true);
 			qDebug() << "LIST LENGTH+:  " << filesChecked.length();
 		}
 		else{ 
 			//remove file if it was unchecked
-			int i = filesChecked.indexOf(index.row());
+			int i = filesChecked.indexOf(recIndex);
 			filesChecked.removeAt(i);
 			if (filesChecked.isEmpty()) emit fileChoosen(false);// noFilesChoosen();
 			qDebug()<<"LIST LENGTH-:  "<<filesChecked.length();
@@ -67,19 +69,30 @@ bool FileDataModel::setData(const QModelIndex & index, const QVariant & value, i
 	return true;
 }
 
+void FileDataModel::OnCellClicked(const QModelIndex &index)
+{
+	QModelIndex ind = index;
+	if (index.isValid() && (index.column() == 0)) {
+		bool isChecked = data(index, Qt::CheckStateRole).toBool();
+		setData(index, !isChecked, Qt::EditRole);
+	}
+
+}
+
+
 Qt::ItemFlags FileDataModel::flags(const QModelIndex & index) const
 {
 	if (index.column() == 0) 
-		return Qt::ItemIsUserCheckable | QAbstractTableModel::flags(index) | Qt::ItemIsEnabled | Qt::ItemIsEditable;
+		return Qt::ItemIsUserCheckable | QAbstractTableModel::flags(index) | Qt::ItemIsEnabled;
 	else
 		return QAbstractTableModel::flags(index);
 }
 
 QVariant FileDataModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-	if (role == Qt::DisplayRole)
+	if (orientation == Qt::Horizontal)
 	{
-		if (orientation == Qt::Horizontal) {
+		if (role == Qt::DisplayRole) {
 			switch (section)
 			{
 			case 0:
@@ -92,12 +105,33 @@ QVariant FileDataModel::headerData(int section, Qt::Orientation orientation, int
 				return "Size";
 			case 4:
 				return "Catalog"; // ? IsOrganized
+			case 5:
+				return "Record index";
+			default:
+				break;
+			}
+		}
+		else if (role == Qt::SizeHintRole)
+		{
+			switch (section)
+			{
+			case 0:
+				return QSize(10,10);
+			case 2:
+				return QSize(20, 10);
+			case 3:
+				return QSize(30, 10);
 			default:
 				break;
 			}
 		}
 	}
-	return QVariant();
+	else if (orientation == Qt::Vertical) {
+				return QVariant();
+		}
+
+	return QAbstractTableModel::headerData(section, orientation, role);
+
 }
 
 bool FileDataModel::insertRows(int row, int count, const QModelIndex & parent)
@@ -116,10 +150,6 @@ void FileDataModel::setDataSource(Catalog * source)
 	dataSource = source;//насколько это адекватная запись? указатель передаем по значению, достаточно ли присваивания
 	//QObject::connect(dataSource, SIGNAL(dataChanged()), this, SLOT(updateCatalog()));
 	//filesChecked = new QList<int>;
-}
-
-void FileDataModel::addData()
-{
 }
 
 void FileDataModel::SendFilesList(QString dirName)
