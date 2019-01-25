@@ -1,4 +1,13 @@
 ﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (QtMediaCatalog.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  Moc'ing Catalog.h...
+  moc_Catalog.cpp
+  moc_FileDataModel.cpp
+  moc_QtMediaCatalog.cpp
+  Catalog.cpp
   FileDataModel.cpp
+  MediaRecord.cpp
+  QtMediaCatalog.cpp
+  main.cpp
+QtMediaCatalog.cpp(32): warning C4129: ')': unrecognized character escape sequence
   QtMediaCatalog.vcxproj -> E:\DEVPROJECTS\Repos\KatFei\sholohova-eyu\QtMediaCatalog-cop\x64\Debug\QtMediaCatalog-cop.exe
   QtMediaCatalog.vcxproj -> E:\DEVPROJECTS\Repos\KatFei\sholohova-eyu\QtMediaCatalog-cop\x64\Debug\QtMediaCatalog-cop.pdb (Full PDB)

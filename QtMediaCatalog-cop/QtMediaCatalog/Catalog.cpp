@@ -12,10 +12,6 @@ Catalog::Catalog(QObject *parent)
 	extensions = "*.mp3 *.avi *.mkv *.mp4 ";
 }
 
-Catalog::~Catalog()
-{
-}
-
 void Catalog::SearchFiles(QString path, QString strExts)
 {
 	QDir dir(path);					qDebug() << "FILLING CATALOG" << dir.absolutePath();
@@ -30,11 +26,8 @@ void Catalog::SearchFiles(QString path, QString strExts)
 			}
 			else
 			{
-				//files.resize(files.size() + 10); ???
 				files.push_back(MediaRecord(i));
 				qDebug() << "ADDING " << i.fileName();
-				//MediaRecord temp(files[n]);
-				//qDebug() << "ADDED" << temp.ToString().at(0);
 				n += 1;
 			}
 		};
@@ -43,10 +36,6 @@ void Catalog::SearchFiles(QString path, QString strExts)
 
 void Catalog::FillCatalog(QString path, QString strExts)
 {
-	//maybe its better to create catalog for each search??
-	/*if(!files.isEmpty()) files.clear();
-	if (!dirs.isEmpty()) dirs.clear();
-	n = 0;*/
 	if(extensions != strExts)
 		extensions += strExts;
 	SearchFiles(path, extensions);
@@ -69,8 +58,6 @@ QStringList Catalog::GetNextFileData(int i)
 void Catalog::OrganizeFiles(QString dirName, QList<int> chfiles)
 {
 	qDebug() << "Directory " << dirName;
-
-	//dirName.replace(QRegularExpression("\\+"),"/");
 	QRegularExpression re("\\+");
 	QString dir2N = dirName.replace(re, "/");
 	qDebug() << "Directory " << dir2N;
@@ -80,10 +67,9 @@ void Catalog::OrganizeFiles(QString dirName, QList<int> chfiles)
 	dirs.append(dirName);
 	for each (int i in chfiles)
 	{
-		//MediaRecord *temp = &files.;
 		files[i].SetNewDir(dirName);
 	}
-	emit dirAdded(dirName);			//dirsFullUpdate(dirs);
+	emit dirAdded(dirName);
 	emit organized();
 }
 
@@ -97,7 +83,6 @@ void Catalog::GenerateCatalog(QString newPath)
 	qDebug() << "filesystem type:" << storage.fileSystemType();
 	qDebug() << "size:" << storage.bytesTotal() / 1000 / 1000 << "Mb";
 	qDebug() << "free space:" << storage.bytesAvailable() / 1000 / 1000 << "Mb";
-	//calculating total size of organized files - maybe in separate method? or while organizing files?
 	qint64 totalSize = 0;
 	for each (MediaRecord var in files)
 	{
@@ -124,7 +109,6 @@ void Catalog::GenerateCatalog(QString newPath)
 		qDebug() << "MEDIACATALOG IS READY"<<"\nFAILED TO COPY: "<<fails;
 		emit generated(fails);
 	}
-
 }
 
 //void Catalog::dataChanged() { if (isChanged) { isChanged = false; emit dataChanged(); } }//?сигнал не имеет реализации он просто вызывается

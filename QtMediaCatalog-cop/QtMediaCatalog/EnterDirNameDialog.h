@@ -16,7 +16,6 @@ class EnterDirNameDialog : public QDialog
 private:
 	QLabel *lblName;
 	QLineEdit *editName;
-	//в QLineEdit нужно добавить RegExp
 	QHBoxLayout *dlgHLayout;
 	QDialogButtonBox *dlgButtons;
 	QVBoxLayout *dlgLayout;
@@ -26,5 +25,5 @@ public:
 	~EnterDirNameDialog();
 	QString GetDirName() { return dirName;};
 private slots:
-	void AddClicked();// внутри проверка имени на наличие / \ и вывод предупреждающего сообщения
+	void AddClicked();
 };

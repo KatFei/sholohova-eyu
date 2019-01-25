@@ -4,14 +4,9 @@
 #pragma once
 
 FileDataModel::FileDataModel(QObject *parent)
-	: QAbstractTableModel(parent)
-{	
-	
-}
+	: QAbstractTableModel(parent) {}
 
-FileDataModel::~FileDataModel()
-{
-}
+FileDataModel::~FileDataModel() {}
 
 QVariant FileDataModel::data(const QModelIndex & index, int role) const
 {
@@ -24,7 +19,7 @@ QVariant FileDataModel::data(const QModelIndex & index, int role) const
 		const QStringList curr = dataSource->GetNextFileData(index.row());
 
 		if ((role == Qt::CheckStateRole) && (index.column() == 0)) {
-			if (filesChecked.contains(curr.at(4).toInt()))	//if (index.column() == 0) //add a checkbox to cell(1,0)
+			if (filesChecked.contains(curr.at(4).toInt()))
 			{
 				return Qt::Checked;
 			}
@@ -32,15 +27,11 @@ QVariant FileDataModel::data(const QModelIndex & index, int role) const
 				return Qt::Unchecked;
 		}
 		if (role == Qt::DisplayRole) {
-			
-			//qDebug() << "ADDED" << curr.at(0);
-				// добавить проверку выхода индексов за границы QStringList
 			if ((index.column() - 1 <= curr.length()) && (index.column() != 0)) {
-				return curr.at(index.column() - 1);//можно вместо сдвига индексов вставлять колонку с checkIndex
+				return curr.at(index.column() - 1);
 			}
 		}
 	}
-/**/
 	return QVariant();
 }
 
@@ -51,18 +42,18 @@ bool FileDataModel::setData(const QModelIndex & index, const QVariant & value, i
 		//check value from editor
 		if (value.toBool()) {
 			// add file if it was checked
-			filesChecked.append(index.row());	//recIndex
+			filesChecked.append(index.row());
 			emit fileChoosen(true);
 			qDebug() << "LIST LENGTH+:  " << filesChecked.length();
 		}
 		else {
 			//remove file if it was unchecked
-			int i = filesChecked.indexOf(index.row());	//recIndex
+			int i = filesChecked.indexOf(index.row());
 			filesChecked.removeAt(i);
-			if (filesChecked.isEmpty()) emit fileChoosen(false);// noFilesChoosen();
+			if (filesChecked.isEmpty()) emit fileChoosen(false);
 			qDebug() << "LIST LENGTH-:  " << filesChecked.length();
-		}//emit editCompleted(result);// посылать сигнал вьюшке, чтобы она отображала галочку?
-	}/**/
+		}
+	}
 	return true;
 }
 
@@ -101,7 +92,7 @@ QVariant FileDataModel::headerData(int section, Qt::Orientation orientation, int
 			case 3:
 				return "Size";
 			case 4:
-				return "Catalog"; // ? IsOrganized
+				return "Catalog"; 
 			case 5:
 				return "Record index";
 			default:
@@ -131,22 +122,9 @@ QVariant FileDataModel::headerData(int section, Qt::Orientation orientation, int
 
 }
 
-bool FileDataModel::insertRows(int row, int count, const QModelIndex & parent)
-{
-	beginInsertRows(QModelIndex(), row, row + count - 1);
-	for (int i = 0; i < count; ++i) 
-	{
-
-	}
-	endInsertRows();
-	return true;
-}
-
 void FileDataModel::setDataSource(Catalog * source)
 {
-	dataSource = source;//насколько это адекватная запись? указатель передаем по значению, достаточно ли присваивания
-	//QObject::connect(dataSource, SIGNAL(dataChanged()), this, SLOT(updateCatalog()));
-	//filesChecked = new QList<int>;
+	dataSource = source;
 }
 
 void FileDataModel::SendFilesList(QString dirName)
@@ -158,9 +136,7 @@ void FileDataModel::SendFilesList(QString dirName)
 
 void FileDataModel::updateCatalog()
 {
-	//emit dataChanged();
 	beginResetModel(); resetInternalData(); endResetModel();
-
 	emit layoutChanged();
 }
 

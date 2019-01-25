@@ -7,7 +7,6 @@ EnterDirNameDialog::EnterDirNameDialog(QWidget *parent)
 	lblName = new QLabel("Enter directory name: ", this);
 	editName = new QLineEdit(this);
 	editName->setValidator(new QRegExpValidator(QRegExp("[^<>:\"|!?*]+(\|/)")));
-	//в QLineEdit нужно добавить RegExp
 	dlgButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
 	dlgButtons->button(QDialogButtonBox::Ok)->setText("Add");
 	
@@ -34,10 +33,6 @@ EnterDirNameDialog::~EnterDirNameDialog()
 void EnterDirNameDialog::AddClicked()
 {
 	QRegularExpression rx(".(\\|/)+.");
-	//rx.setPatternSyntax(QRegExp::RegExp);
-	//replace all repeated / and \
-	//replace / and \ at the beginning and at the end
-	//
 	dirName = editName->text();
 	if ((editName->text().contains(("\\")))||(editName->text().contains(("/")))) //(editName->text().contains(("(\\|/)")))//(rx.indexIn(editName->text())>-1)
 	{
@@ -46,9 +41,7 @@ void EnterDirNameDialog::AddClicked()
 			QMessageBox::Ok | QMessageBox::Cancel, this);
 		qDebug() << editName->text();
 		if (msgBox->exec()== QMessageBox::Ok) { accept(); }
-		//else	{ reject();	}
 	}
 	else
 	{ accept(); }
-	
 }

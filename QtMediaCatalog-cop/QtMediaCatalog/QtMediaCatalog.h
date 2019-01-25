@@ -3,7 +3,6 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_QtMediaCatalog.h"
 #include "FileDataModel.h"
-#include "CheckBoxDelegate.h"
 #include "ProxyModel.h"
 #include <QStandardItemModel>
 
@@ -20,7 +19,6 @@
 class QtMediaCatalog : public QMainWindow
 {
 	Q_OBJECT
-
 public:
 	QtMediaCatalog(QWidget *parent = Q_NULLPTR);
 private:
@@ -37,27 +35,20 @@ private:
 	QTableView *fileTable;
 	QTreeWidget *treeDirs;
 	FileDataModel *model;
-	CheckBoxDelegate *chbDelegate;
 	ProxyModel *filterModel;
 	Catalog* catalog;
 signals:
-	//void BrowseClicked();
 	void pathEntered(QString pathToDir, QString extensions = "");
 	void dirEntered(QString dirName);
 	void organizingCompleted(QString pathToCat);
-
 public slots:
-	void UpdateTable();//Catalog* catalog
-	void UpdateTree(QStringList dirs);//Qlist из Catalog
+	void UpdateTable();
+	void UpdateTree(QStringList dirs);
 	void AddDirToTree(QString dirName);
 	void Generated(int fails);
 private slots :
 	void SearchClicked();
-	void OpenFileBrowser();//?возвращать QString?
+	void OpenFileBrowser();
 	void AddClicked();
 	void GenerateClicked();
-	/*void AddFileToCat();
-	void GenerateCatalog();*/
 };
-//Catalog *dataSource;
-//void setDataSource(Catalog *source);

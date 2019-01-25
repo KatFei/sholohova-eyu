@@ -13,12 +13,6 @@ MediaRecord::MediaRecord(QFileInfo fInfo)
 	fileInfo = fInfo;
 	newDir = "";
 }
-/*MediaRecord::MediaRecord(const MediaRecord & rec)
-{
-	qDebug() << "In copy constructor";
-	fileInfo = rec.fileInfo;
-}*/
-MediaRecord::~MediaRecord() {}
 
 bool MediaRecord::CopyFile(QString newPath)
 {
